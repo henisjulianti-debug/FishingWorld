@@ -1,7 +1,7 @@
 
 name: Build Fishing World APK
 
-'on':
+'on':.
   workflow_dispatch:
   push:
     branches:
