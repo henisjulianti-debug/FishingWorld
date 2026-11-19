@@ -1,0 +1,57 @@
+
+name: Build Fishing World APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil kode game
+        uses: actions/checkout@v4
+
+      - name: Siapkan Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Siapkan Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Siapkan Capacitor
+        run: |
+          npm install
+          npm install @capacitor/core @capacitor/android
+          npm install --save-dev @capacitor/cli
+
+      - name: Buat konfigurasi aplikasi
+        run: |
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.fishingworld.game",
+            "appName": "Fishing World",
+            "webDir": "public"
+          }
+          EOF
+
+      - name: Buat project Android
+        run: npx cap add android
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Simpan APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fishing-World-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          
